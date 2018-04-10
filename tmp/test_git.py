@@ -103,9 +103,9 @@ def main( ):
 
 	repo = get_repo()
 	commit = repo.head.commit
-	# print commit
-	master = repo.head.reference
-	print master.log()
+	print commit.message
+	# master = repo.head.reference
+	# print master.log()
 	make_pull_request(repo_github, branch_info['branch_from'], branch_info['branch_to'])
 
 main()
