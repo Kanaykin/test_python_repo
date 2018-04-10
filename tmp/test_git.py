@@ -85,9 +85,9 @@ def get_repository():
 
 	return None
 
-def make_pull_request(repo_github, branch_from, branch_to):
+def make_pull_request(repo_github, branch_from, branch_to, message, body):
 	try:
-		pull = repo_github.create_pull("Pull request created by PyGithub", "Body of the pull request", branch_from, branch_to, True)
+		pull = repo_github.create_pull(message, body, branch_from, branch_to, True)
 	except GithubException, exception:
 		print "error"
 
@@ -103,10 +103,8 @@ def main( ):
 
 	repo = get_repo()
 	commit = repo.head.commit
-	print commit.message
-	# master = repo.head.reference
-	# print master.log()
-	make_pull_request(repo_github, branch_info['branch_from'], branch_info['branch_to'])
+	commit_info =  commit.message.splitlines()
+	make_pull_request(repo_github, branch_info['branch_from'], branch_info['branch_to'], commit_info[0], commit_info[1])
 
 main()
 
