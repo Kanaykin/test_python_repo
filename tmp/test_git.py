@@ -101,9 +101,11 @@ def main( ):
 	authorization_info = get_github_authorization_info()
 	branch_info = create_branch(authorization_info['login'])
 
-	# repo = get_repo()
-	# commit = repo.head.commit
+	repo = get_repo()
+	commit = repo.head.commit
 	# print commit
+	master = repo.head.reference
+	print master.log()
 	make_pull_request(repo_github, branch_info['branch_from'], branch_info['branch_to'])
 
 main()
