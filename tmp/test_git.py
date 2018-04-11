@@ -13,7 +13,6 @@ import os
 import cmd
 
 REPOSITORY_NAME = "test_python_repo"
-# g = Github("SergeyKanaykin", "hrenvam1")
 
 #############################
 #получение текущей директории репозитория
@@ -37,6 +36,7 @@ def create_branch(login):
 	origin.fetch()
 
 	repo.git.push('origin', new_branch_name)
+	print "Create branch success " + new_branch_name
 	return  {'branch_from' : new_branch_name, 'branch_to' : branch.name}
 
 #############################
@@ -77,12 +77,11 @@ def get_repository():
 	g = Github(authorization_info['login'], authorization_info['password'])
 	try:
 		for repo in g.get_user().get_repos():
-			print(repo.name)
 			if repo.name == REPOSITORY_NAME :
 				save_github_authorization_info(authorization_info['login'], authorization_info['password'])
 				return repo
 	except GithubException, exception:
-		print "error"
+		print "Error : Authorization failed or Not found repository : " + REPOSITORY_NAME
 
 	return None
 
@@ -93,7 +92,7 @@ def make_pull_request(repo_github, branch_from, branch_to, message, body):
 		webbrowser.open(pull.html_url)
 		return True
 	except GithubException, exception:
-		print "error"
+		print "Error: Create pull error !!! branch_from: " + branch_from + " branch_to " + branch_to
 		return False
 
 def delete_branch(branch_from, branch_to):
@@ -115,41 +114,16 @@ def main( ):
 	repo = get_repo()
 	commit = repo.head.commit
 	commit_info =  commit.message.splitlines()
-	request_created = make_pull_request(repo_github, branch_info['branch_from'], branch_info['branch_to'], commit_info[0], commit_info[1])
+	message = commit_info[0]
+	body = ""
+	if len(commit_info) > 1:
+		body = commit_info[1]
+	request_created = make_pull_request(repo_github, branch_info['branch_from'], branch_info['branch_to'], message, body)
 	if request_created == False:
-		print "error"
+		print "Make pull request error "
 		return
 
 	# удалим бранч
 	delete_branch(branch_info['branch_from'], branch_info['branch_to'])
 
 main()
-
-exit()
-
-# past_branch = repo.create_head("tmp/" + branch.name+"_tmp", 'HEAD')
-# origin = repo.remote()
-# assert origin.exists()
-# origin.fetch()
-
-# repo.git.push('origin', "tmp/" + branch.name+"_tmp")
-g = Github("SergeyKanaykin", "hrenvam1")
-
-
-for repo in g.get_user().get_repos():
-    print(repo.name)
-    if repo.name == "mansion-makeover" :
-    	mansion_makeover_repo = repo
-
-    # repo.edit(has_wiki=False)
-
-
-user = g.get_user()
-# repo = user.get_repo("Playrix/mansion-makeover")
-commit = mansion_makeover_repo.get_commit("73ddccac8d6fdfd2304e789e34f6a238bbbeb41b")
-# issue = mansion_makeover_repo.create_issue("Issue created by PyGithub")
-# comment = self.pull.create_comment("Comment created by PyGithub", commit, "src/github/Issue.py", 5)
-pull = mansion_makeover_repo.create_pull("Pull request created by PyGithub", "Body of the pull request", "tmp/cats_action_queue", "master", True)
-
-# Github.PullRequest.PullRequest
-# POST /repos/:owner/:repo/pulls
