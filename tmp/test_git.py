@@ -7,6 +7,7 @@ from github import GithubException
 from config import Config
 from os.path import expanduser
 import time
+import webbrowser
 
 import os
 import cmd
