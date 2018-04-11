@@ -36,7 +36,7 @@ def create_branch(login):
 	origin.fetch()
 
 	repo.git.push('origin', new_branch_name)
-	return  {'branch_from' : branch.name, 'branch_to' : new_branch_name}
+	return  {'branch_from' : new_branch_name, 'branch_to' : branch.name}
 
 #############################
 # получить имя конфигурационного файла
@@ -87,9 +87,17 @@ def get_repository():
 
 def make_pull_request(repo_github, branch_from, branch_to, message, body):
 	try:
-		pull = repo_github.create_pull(message, body, branch_from, branch_to, True)
+		pull = repo_github.create_pull(message, body, branch_to, branch_from, True)
+		return True
 	except GithubException, exception:
 		print "error"
+		return False
+
+def delete_branch(branch_from, branch_to):
+	repo = get_repo()
+	repo.delete_head(branch_from)
+	# ресетим текущий бранч
+	repo.git.reset('--hard','origin/'+branch_to)
 
 def main( ):
 	
@@ -104,7 +112,13 @@ def main( ):
 	repo = get_repo()
 	commit = repo.head.commit
 	commit_info =  commit.message.splitlines()
-	make_pull_request(repo_github, branch_info['branch_from'], branch_info['branch_to'], commit_info[0], commit_info[1])
+	request_created = make_pull_request(repo_github, branch_info['branch_from'], branch_info['branch_to'], commit_info[0], commit_info[1])
+	if request_created == False:
+		print "error"
+		return
+
+	# удалим бранч
+	delete_branch(branch_info['branch_from'], branch_info['branch_to'])
 
 main()
 
