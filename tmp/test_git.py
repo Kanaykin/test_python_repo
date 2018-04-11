@@ -7,6 +7,7 @@ from github import GithubException
 from config import Config
 from os.path import expanduser
 import time
+import webbrowser
 
 import os
 import cmd
@@ -89,6 +90,7 @@ def make_pull_request(repo_github, branch_from, branch_to, message, body):
 	try:
 		pull = repo_github.create_pull(message, body, branch_to, branch_from, True)
 		print "Pull request url " + pull.url
+		webbrowser.open(pull.url)
 		return True
 	except GithubException, exception:
 		print "error"
